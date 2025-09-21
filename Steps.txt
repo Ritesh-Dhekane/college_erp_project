@@ -1,0 +1,10 @@
+Djngo installation
+python -m venv venv
+venv\Scripts\activate
+pip install django
+
+Prject creation
+django-admin startproject college_erp
+
+Run project
+python manage.py runserver
