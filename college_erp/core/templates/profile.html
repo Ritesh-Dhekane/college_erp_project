@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block title %}Profile | College ERP{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2>Profile</h2>
+    <p>Name: {{ request.user.first_name }} {{ request.user.last_name }}</p>
+    <p>Email: {{ request.user.email }}</p>
+    <p>Role: {{ request.user.role|capfirst }}</p>
+</div>
+{% endblock %}

@@ -72,6 +72,9 @@ def logout_view(request):
     auth_logout(request)
     return redirect('home')
 
+@login_required
+def profile(request):
+    return render(request, 'profile.html', {'year': datetime.now().year})
 
 @login_required
 def student_dashboard(request):
@@ -92,3 +95,12 @@ def clerk_dashboard(request):
 @login_required
 def librarian_dashboard(request):
     return render(request, 'dashboard/librarian.html', {'user': request.user})
+
+
+def student_issued_books(request):
+    books = BookIssue.objects.filter(student=request.user)
+    return render(request, 'student_issued_books.html', {'books': books})
+
+def all_book_issue_history(request):
+    issues = BookIssue.objects.all()
+    return render(request, 'all_book_issue_history.html', {'issues': issues})

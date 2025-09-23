@@ -1,0 +1,87 @@
+{% comment %}
+Dynamic sidebar for logged-in users.
+- Full height
+- Collapsible on small screens via hamburger
+- Role-based menu
+- Safe: does not crash if URLs are not yet implemented
+{% endcomment %}
+
+{% if request.user.is_authenticated %}
+<nav class="d-flex flex-column flex-shrink-0 bg-light vh-100 p-3 border-end" style="width: 250px;">
+  
+  <!-- Hamburger for small screens -->
+  <button class="btn btn-primary d-md-none mb-3" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarMenu">
+    <i class="bi bi-list"></i>
+  </button>
+
+  <div class="collapse d-md-block" id="sidebarMenu">
+
+    <!-- Profile circle -->
+    <div class="mb-4 text-center">
+      <div class="rounded-circle bg-primary text-white d-flex justify-content-center align-items-center mx-auto" style="width:60px; height:60px; font-size:1.5rem;">
+        {{ request.user.first_name|first|upper }}
+      </div>
+      <h6 class="mt-2 mb-0">{{ request.user.first_name }} {{ request.user.last_name }}</h6>
+      <small class="text-muted">{{ request.user.role|capfirst }}</small>
+    </div>
+
+    <!-- Menu -->
+    <ul class="nav nav-pills flex-column mb-auto">
+      <!-- Common -->
+      <li class="nav-item mb-2">
+        <a href="{% url 'profile' %}" class="nav-link text-dark">
+          <i class="bi bi-person-circle me-2"></i> Profile
+        </a>
+      </li>
+
+      <!-- Role-specific -->
+      {% if request.user.role == 'student' %}
+      <li class="nav-item mb-2">
+        <a class="nav-link text-dark" data-bs-toggle="collapse" href="#libraryMenuStudent" role="button" aria-expanded="false" aria-controls="libraryMenuStudent">
+          <i class="bi bi-book me-2"></i> Library
+        </a>
+        <div class="collapse" id="libraryMenuStudent">
+          <ul class="nav flex-column ms-3">
+            <li class="nav-item">
+              <a href="#" class="nav-link text-dark">Issued Books</a>
+            </li>
+          </ul>
+        </div>
+      </li>
+      {% elif request.user.role == 'librarian' %}
+      <li class="nav-item mb-2">
+        <a class="nav-link text-dark" data-bs-toggle="collapse" href="#libraryMenuLibrarian" role="button" aria-expanded="false" aria-controls="libraryMenuLibrarian">
+          <i class="bi bi-book me-2"></i> Library
+        </a>
+        <div class="collapse" id="libraryMenuLibrarian">
+          <ul class="nav flex-column ms-3">
+            <li class="nav-item">
+              <a href="#" class="nav-link text-dark">Book Issue History</a>
+            </li>
+          </ul>
+        </div>
+      </li>
+      {% elif request.user.role == 'teacher' %}
+      <li class="nav-item mb-2">
+        <a href="#" class="nav-link text-dark">
+          <i class="bi bi-journal-text me-2"></i> Teacher Dashboard
+        </a>
+      </li>
+      {% elif request.user.role == 'admin' %}
+      <li class="nav-item mb-2">
+        <a href="#" class="nav-link text-dark">
+          <i class="bi bi-speedometer2 me-2"></i> Admin Dashboard
+        </a>
+      </li>
+      {% elif request.user.role == 'clerk' %}
+      <li class="nav-item mb-2">
+        <a href="#" class="nav-link text-dark">
+          <i class="bi bi-file-earmark-text me-2"></i> Clerk Dashboard
+        </a>
+      </li>
+      {% endif %}
+
+    </ul>
+  </div>
+</nav>
+{% endif %}

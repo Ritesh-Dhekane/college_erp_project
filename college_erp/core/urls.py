@@ -15,4 +15,10 @@ urlpatterns = [
     path('dashboard/admin/', views.admin_dashboard, name='admin_dashboard'),
     path('dashboard/clerk/', views.clerk_dashboard, name='clerk_dashboard'),
     path('dashboard/librarian/', views.librarian_dashboard, name='librarian_dashboard'),
+
+    # Library management URLs
+    path('library/my-books/', views.student_issued_books, name='student_issued_books'),
+    path('library/all-issues/', views.all_book_issue_history, name='all_book_issue_history'),
+
+    path('profile/', views.profile, name='profile'),
 ]
