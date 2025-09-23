@@ -1,28 +1,74 @@
-# Python bytecode
-__pycache__/
+# Python
 *.pyc
 *.pyo
 *.pyd
+__pycache__/
+*.so
 
 # Virtual environment
 venv/
+env/
+.venv/
 .env/
 
-# Distribution / packaging
-build/
-dist/
-*.egg-info/
-.eggs/
+# Django
+*.log
+*.pot
+*.py[cod]
+__pycache__/
+db.sqlite3
+/media
+/staticfiles
+/local_settings.py
 
-# IDE / editor settings
+# Django migrations
+*/migrations/*.py
+!*/migrations/__init__.py
+
+# Node / frontend (if using npm or yarn)
+node_modules/
+npm-debug.log
+yarn-error.log
+dist/
+
+# IDEs / editors
 .vscode/
 .idea/
-*.swp
-*.swo
+*.sublime-project
+*.sublime-workspace
+*.code-workspace
 
-# Logs
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Coverage reports
+htmlcov/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
 *.log
 
-# OS-specific files
-.DS_Store
-Thumbs.db
+# Pytest
+.pytest_cache/
+
+# Environments
+.env
+.env.local
+.env.*.local
+
+# JetBrains IDEs
+*.iml
+*.ipr
+*.iws
+
+# VS Code settings
+.vscode/

@@ -1,5 +1,10 @@
 Djngo installation
-python -m venv venv
+# Create virtual environment
+python3 -m venv venv
+
+# Activate venv (Mac/Linux)
+source venv/bin/activate 
+# Activate venv (Windows)
 venv\Scripts\activate
 pip install django
 

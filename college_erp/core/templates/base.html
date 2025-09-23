@@ -1,45 +1,137 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{% block title %}College ERP{% endblock %}</title>
-    <!-- Bootstrap 5 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
-</head>
-<body>
+
+    <!-- Bootstrap 5 -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <!-- Google Fonts -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{% static 'css/style.css' %}" />
+
+    <style>
+      /* Flex layout to make footer stick to bottom */
+      html,
+      body {
+        height: 100%;
+        margin: 0;
+      }
+
+      body {
+        display: flex;
+        flex-direction: column;
+      }
+
+      main {
+        flex: 1 0 auto; /* allow main content to grow and push footer down */
+      }
+
+      footer {
+        flex-shrink: 0; /* footer does not shrink */
+      }
+    </style>
+  </head>
+  <body>
     <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-      <div class="container">
-        <a class="navbar-brand" href="{% url 'home' %}">College ERP</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-          <ul class="navbar-nav ms-auto">
-            <li class="nav-item"><a class="nav-link" href="{% url 'home' %}">Home</a></li>
-            <li class="nav-item"><a class="nav-link" href="{% url 'register' %}">Register</a></li>
-            <li class="nav-item"><a class="nav-link" href="{% url 'login' %}">Login</a></li>
-          </ul>
+    <nav
+      class="navbar navbar-expand-lg navbar-dark bg-gradient-primary shadow-sm"
+    >
+      <div
+        class="container-fluid d-flex justify-content-between align-items-center px-4"
+      >
+        <!-- Left: Logo + Project Name -->
+        <a
+          class="navbar-brand fw-bold d-flex align-items-center"
+          href="{% url 'home' %}"
+        >
+          🎓 College ERP
+        </a>
+
+        <!-- Right: Profile / Login-Register -->
+        <div>
+          {% if request.user.is_authenticated %}
+          <!-- Profile dropdown -->
+          <div class="dropdown">
+            <a
+              class="d-flex align-items-center text-white text-decoration-none dropdown-toggle"
+              href="#"
+              role="button"
+              id="profileDropdown"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+            >
+              <div
+                class="rounded-circle bg-white text-primary d-flex justify-content-center align-items-center"
+                style="width: 40px; height: 40px; font-weight: 600"
+              >
+                {{ request.user.first_name|first|upper }}
+              </div>
+            </a>
+            <ul
+              class="dropdown-menu dropdown-menu-end"
+              aria-labelledby="profileDropdown"
+            >
+              <li class="dropdown-item-text fw-bold">
+                {{ request.user.first_name }} {{ request.user.last_name }}
+              </li>
+              <li class="dropdown-item-text text-muted">
+                {{ request.user.role|capfirst }}
+              </li>
+              <li><hr class="dropdown-divider" /></li>
+              <li>
+                <a class="dropdown-item" href="{% url 'logout' %}">Logout</a>
+              </li>
+            </ul>
+          </div>
+          {% else %}
+          <!-- Login / Register buttons -->
+          <a href="{% url 'login' %}" class="btn btn-outline-light me-2"
+            >Login</a
+          >
+          <a href="{% url 'register' %}" class="btn btn-light">Register</a>
+          {% endif %}
         </div>
       </div>
     </nav>
 
-    <!-- Main content -->
-    <div class="container my-5">
-        {% block content %}{% endblock %}
-    </div>
+    <!-- Main Content -->
+    <main class="flex-grow-1">
+      <div class="container my-5">{% block content %}{% endblock %}</div>
+    </main>
 
     <!-- Footer -->
-    <footer class="bg-dark text-white py-3 mt-5">
-        <div class="container text-center">
-            &copy; {{ year }} College ERP. All Rights Reserved.
+    <footer class="bg-dark bg-gradient text-white py-4 mt-auto shadow-lg">
+      <div
+        class="container text-center small d-flex flex-column flex-md-row justify-content-between align-items-center"
+      >
+        <p class="mb-2 mb-md-0">&copy; {{ year }} College ERP</p>
+        <div>
+          <a href="#" class="text-white text-decoration-none mx-2 footer-link"
+            >About</a
+          >
+          ·
+          <a href="#" class="text-white text-decoration-none mx-2 footer-link"
+            >Contact</a
+          >
+          ·
+          <a href="#" class="text-white text-decoration-none mx-2 footer-link"
+            >Privacy</a
+          >
         </div>
+      </div>
     </footer>
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
-</body>
+  </body>
 </html>

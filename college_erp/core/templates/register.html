@@ -1,34 +1,65 @@
-{% extends 'base.html' %}
-{% block title %}Register | College ERP{% endblock %}
-
+{% extends 'base.html' %} {% block title %}Register | College ERP{% endblock %}
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-6">
-        <div class="card shadow-sm">
-            <div class="card-header bg-primary text-white">Student Registration</div>
-            <div class="card-body">
-                <form method="post">
-                    {% csrf_token %}
-                    <div class="mb-3">
-                        <label for="full_name" class="form-label">Full Name</label>
-                        <input type="text" class="form-control" name="full_name" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="roll_number" class="form-label">Roll Number</label>
-                        <input type="text" class="form-control" name="roll_number" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="email" class="form-label">Email</label>
-                        <input type="email" class="form-control" name="email" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="password" class="form-label">Password</label>
-                        <input type="password" class="form-control" name="password" required>
-                    </div>
-                    <button type="submit" class="btn btn-primary w-100">Register</button>
-                </form>
-            </div>
-        </div>
+<div
+  class="d-flex justify-content-center align-items-center"
+  style="min-height: 70vh"
+>
+  <div class="col-md-6 col-lg-5">
+    <div class="card shadow-lg rounded-4">
+      <div
+        class="card-header bg-primary text-white text-center fw-semibold rounded-top-4"
+      >
+        Student Registration
+      </div>
+      <div class="card-body p-4">
+        <form method="post">
+          {% csrf_token %}
+          <div class="mb-3">
+            <label for="full_name" class="form-label">Full Name</label>
+            <input type="text" class="form-control" name="full_name" required />
+          </div>
+          <div class="mb-3">
+            <label for="roll_number" class="form-label">Roll Number</label>
+            <input
+              type="text"
+              class="form-control"
+              name="roll_number"
+              required
+            />
+          </div>
+          {% if messages %} {% for message in messages %}
+          <div class="alert alert-danger">{{ message }}</div>
+          {% endfor %} {% endif %}
+          <div class="mb-3">
+            <label for="email" class="form-label">Email</label>
+            <input type="email" class="form-control" name="email" required />
+          </div>
+          <div class="mb-3">
+            <label for="password" class="form-label">Password</label>
+            <input
+              type="password"
+              class="form-control"
+              name="password"
+              required
+            />
+          </div>
+          <!-- Role Selection -->
+          <div class="mb-3">
+            <label for="role" class="form-label">Role</label>
+            <select class="form-select" name="role" id="role">
+              <option value="student" selected>Student</option>
+              <option value="teacher">Teacher</option>
+              <option value="admin">Admin</option>
+              <option value="clerk">Clerk</option>
+              <option value="librarian">Librarian</option>
+            </select>
+          </div>
+          <button type="submit" class="btn btn-primary w-100 py-2">
+            Register
+          </button>
+        </form>
+      </div>
     </div>
+  </div>
 </div>
 {% endblock %}

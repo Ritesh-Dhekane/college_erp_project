@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+{% block title %}Login | College ERP{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-center align-items-center" style="min-height: 70vh;">
+  <div class="col-md-6 col-lg-5">
+    <div class="card shadow-lg rounded-4">
+      <div class="card-header bg-primary text-white text-center fw-semibold rounded-top-4">
+        Login to College ERP
+      </div>
+      <div class="card-body p-4">
+
+        <!-- Display messages -->
+        {% if messages %}
+          {% for message in messages %}
+            <div class="alert alert-danger">{{ message }}</div>
+          {% endfor %}
+        {% endif %}
+
+        <form method="post">
+          {% csrf_token %}
+          <div class="mb-3">
+            <label for="email" class="form-label">Email</label>
+            <input type="email" class="form-control" name="email" id="email" placeholder="Enter your email" required>
+          </div>
+          <div class="mb-3">
+            <label for="password" class="form-label">Password</label>
+            <input type="password" class="form-control" name="password" id="password" placeholder="Enter your password" required>
+          </div>
+
+          <!-- Role selection (optional if you want users to choose role at login) -->
+          <!--
+          <div class="mb-3">
+            <label for="role" class="form-label">Role</label>
+            <select class="form-select" name="role" id="role">
+                <option value="student" selected>Student</option>
+                <option value="teacher">Teacher</option>
+                <option value="admin">Admin</option>
+                <option value="clerk">Clerk</option>
+                <option value="librarian">Librarian</option>
+            </select>
+          </div>
+          -->
+
+          <button type="submit" class="btn btn-primary w-100 py-2">Login</button>
+        </form>
+
+        <div class="text-center mt-3">
+          <p class="small text-muted">
+            Don’t have an account? <a href="{% url 'register' %}" class="text-decoration-none">Register here</a>
+          </p>
+          <p class="small">
+            <a href="#" class="text-decoration-none text-primary">Forgot Password?</a>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
