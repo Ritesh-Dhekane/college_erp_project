@@ -75,10 +75,15 @@ WSGI_APPLICATION = 'college_erp.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'college_erp_db',
+        'USER': 'college_erp_user',
+        'PASSWORD': 'StrongPasswordHere',
+        'HOST': 'localhost',
+        'PORT': '5432',
     }
 }
+
 
 
 # Password validation
