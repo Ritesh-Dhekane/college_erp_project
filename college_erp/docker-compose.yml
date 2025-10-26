@@ -1,4 +1,4 @@
-version: '3.8'
+version: '3.8'  # Make sure version is specified
 
 services:
   db:
@@ -8,11 +8,22 @@ services:
     environment:
       POSTGRES_DB: college_erp_db
       POSTGRES_USER: college_erp_user
-      POSTGRES_PASSWORD: StrongPasswordHere
+      POSTGRES_PASSWORD: Ilikecoding@884d
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+
+  web:
+    build: .
+    container_name: college_erp_web
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
 
 volumes:
   postgres_data:

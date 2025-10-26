@@ -78,8 +78,8 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'college_erp_db',
         'USER': 'college_erp_user',
-        'PASSWORD': 'StrongPasswordHere',
-        'HOST': 'localhost',
+        'PASSWORD': 'Ilikecoding@884d',
+        'HOST': 'db',
         'PORT': '5432',
     }
 }
