@@ -10,27 +10,41 @@ def home(request):
 
 def register(request):
     if request.method == "POST":
-        full_name = request.POST.get('full_name')
-        roll_number = request.POST.get('roll_number')
+        # Get form data
+        first_name = request.POST.get('first_name')
+        last_name = request.POST.get('last_name')
         email = request.POST.get('email')
         password = request.POST.get('password')
         role = request.POST.get('role', 'student')
+
+        # Validate required fields
+        if not all([first_name, last_name, email, password, role]):
+            messages.error(request, "All fields are required!")
+            return render(request, 'register.html')
 
         # Check if user already exists
         if User.objects.filter(username=email).exists():
             messages.error(request, "A user with this email already exists.")
             return render(request, 'register.html')
 
-        user = User.objects.create_user(
-            username=email,
-            email=email,
-            password=password,
-            first_name=full_name,
-            role=role
-        )
-        return redirect('login')
+        # Create the user
+        try:
+            user = User.objects.create_user(
+                username=email,
+                email=email,
+                password=password,
+                first_name=first_name,
+                last_name=last_name,
+                role=role
+            )
+            messages.success(request, "User registered successfully!")
+            return redirect('login')
+        except Exception as e:
+            messages.error(request, f"Error creating user: {e}")
+            return render(request, 'register.html')
 
     return render(request, 'register.html')
+
 
 def login_view(request):
     if request.method == "POST":
