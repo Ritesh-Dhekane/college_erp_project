@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Librarian Dashboard{% endblock %}
+
+{% block content %}
+<div class="container dashboard librarian-dashboard">
+  <div class="row">
+    <!-- Sidebar (if you include a separate sidebar template) -->
+    <div class="col-md-3">
+      {% include "sidebar.html" %}
+    </div>
+
+    <!-- Main content -->
+    <div class="col-md-9">
+      <h1 class="mt-2">Librarian Dashboard</h1>
+
+      <!-- Quick stats -->
+      <div class="row my-3">
+        <div class="col-sm-4">
+          <div class="card p-3">
+            <h5>Total Books</h5>
+            <p class="lead">{{ total_books|default:"—" }}</p>
+          </div>
+        </div>
+        <div class="col-sm-4">
+          <div class="card p-3">
+            <h5>Issued Books</h5>
+            <p class="lead">{{ issued_books|default:"—" }}</p>
+          </div>
+        </div>
+        <div class="col-sm-4">
+          <div class="card p-3">
+            <h5>Registered Students</h5>
+            <p class="lead">{{ students_count|default:"—" }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent transactions table -->
+      <div class="card my-3 p-3">
+        <h5>Recent Transactions</h5>
+        {% if transactions %}
+          <div class="table-responsive">
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Book</th>
+                  <th>Student</th>
+                  <th>Type</th>
+                  <th>Date</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for tx in transactions %}
+                  <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ tx.book.title }}</td>
+                    <td>{{ tx.student.get_full_name|default:tx.student.username }}</td>
+                    <td>{{ tx.action }}</td>
+                    <td>{{ tx.date|date:"Y-m-d H:i" }}</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% else %}
+          <p>No recent transactions.</p>
+        {% endif %}
+      </div>
+
+      <!-- Optional section for actions -->
+      <div class="my-3">
+        <a class="btn btn-primary" href="{% url 'core:add-book' %}">Add new book</a>
+        <a class="btn btn-secondary" href="{% url 'core:manage-issues' %}">Manage issues</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

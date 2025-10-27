@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block content %}
+  <h2>Add Book</h2>
+  <form method="post">
+    {% csrf_token %}
+    <label>Title: <input type="text" name="title" required></label><br>
+    <label>Author: <input type="text" name="author"></label><br>
+    <button type="submit">Add</button>
+  </form>
+{% endblock %}

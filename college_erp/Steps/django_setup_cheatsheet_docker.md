@@ -49,8 +49,11 @@ docker-compose exec web python manage.py migrate
 
 docker-compose exec web python manage.py createsuperuser
 
-## 6. Run Development Server
+## Start Docker Desktop  (Open aaplication)
+cd .\college_erp\
+docker-compose up --build 
 
+## 6. Run Development Server
 docker-compose exec web python manage.py runserver 0.0.0.0:8000
 
 ## 7. Access Admin Panel

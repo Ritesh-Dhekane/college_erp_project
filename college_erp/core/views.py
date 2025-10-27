@@ -1,6 +1,7 @@
+# college_erp/core/views.py
 from django.shortcuts import render, redirect
 from datetime import datetime
-from .models import User
+from .models import User, Book, BookIssue  # ensure these models exist in core/models.py
 from django.contrib import messages
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
 from django.contrib.auth.decorators import login_required
@@ -38,7 +39,7 @@ def register(request):
                 role=role
             )
             messages.success(request, "User registered successfully!")
-            return redirect('login')
+            return redirect('core:login')  # namespaced redirect (see note)
         except Exception as e:
             messages.error(request, f"Error creating user: {e}")
             return render(request, 'register.html')
@@ -58,18 +59,19 @@ def login_view(request):
             auth_login(request, user)  # log the user in
 
             # Redirect based on role
+            # Use namespaced names if you included core urls with namespace='core'
             if user.role == 'student':
-                return redirect('student_dashboard')
+                return redirect('core:student_dashboard')
             elif user.role == 'teacher':
-                return redirect('teacher_dashboard')
+                return redirect('core:teacher_dashboard')
             elif user.role == 'admin':
-                return redirect('admin_dashboard')
+                return redirect('core:admin_dashboard')
             elif user.role == 'clerk':
-                return redirect('clerk_dashboard')
+                return redirect('core:clerk_dashboard')
             elif user.role == 'librarian':
-                return redirect('librarian_dashboard')
+                return redirect('core:librarian_dashboard')
             else:
-                return redirect('home')  # fallback
+                return redirect('core:home')  # fallback
 
         else:
             messages.error(request, "Invalid email or password.")
@@ -84,7 +86,7 @@ def library(request):
 
 def logout_view(request):
     auth_logout(request)
-    return redirect('home')
+    return redirect('core:home')
 
 @login_required
 def profile(request):
@@ -110,11 +112,71 @@ def clerk_dashboard(request):
 def librarian_dashboard(request):
     return render(request, 'dashboard/librarian.html', {'user': request.user})
 
+# ----------------------------
+# Library related views below
+# ----------------------------
 
+# Student issued books view — ensure BookIssue model exists
+@login_required
 def student_issued_books(request):
-    books = BookIssue.objects.filter(student=request.user)
+    try:
+        books = BookIssue.objects.filter(student=request.user)
+    except Exception:
+        # If BookIssue model is missing or query fails, return empty list and a message
+        messages.error(request, "BookIssue model not found or query failed.")
+        books = []
     return render(request, 'student_issued_books.html', {'books': books})
 
+# All book issue history (admin/librarian)
+@login_required
 def all_book_issue_history(request):
-    issues = BookIssue.objects.all()
+    try:
+        issues = BookIssue.objects.all()
+    except Exception:
+        messages.error(request, "BookIssue model not found or query failed.")
+        issues = []
     return render(request, 'all_book_issue_history.html', {'issues': issues})
+
+# ----------------------------
+# Missing view stubs that caused your server to crash
+# ----------------------------
+
+@login_required
+def add_book(request):
+    """
+    Simple add-book view stub.
+    - If you have a Book model form, you can replace this with real create logic.
+    """
+    if request.method == "POST":
+        # minimal create logic (adjust according to your Book model fields)
+        title = request.POST.get('title')
+        author = request.POST.get('author')
+        if title:
+            try:
+                Book.objects.create(title=title, author=author or "")
+                messages.success(request, "Book added.")
+                return redirect('core:library')
+            except Exception as e:
+                messages.error(request, f"Could not create book: {e}")
+        else:
+            messages.error(request, "Title is required.")
+    # Render a simple template (create core/templates/add_book.html) or redirect if template missing
+    try:
+        return render(request, 'add_book.html')
+    except Exception:
+        return redirect('core:library')
+
+@login_required
+def manage_issues(request):
+    """
+    Manage issues stub — list all issues and optionally mark returned.
+    """
+    try:
+        issues = BookIssue.objects.all()
+    except Exception:
+        issues = []
+    # Render a manage issues template (create core/templates/manage_issues.html)
+    try:
+        return render(request, 'manage_issues.html', {'issues': issues})
+    except Exception:
+        return redirect('core:library')

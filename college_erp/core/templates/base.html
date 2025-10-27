@@ -53,10 +53,8 @@
         class="container-fluid d-flex justify-content-between align-items-center px-4"
       >
         <!-- Left: Logo + Project Name -->
-        <a
-          class="navbar-brand fw-bold d-flex align-items-center"
-          href="{% url 'home' %}"
-        >
+        <a class="navbar-brand fw-bold d-flex align-items-center" href="{% url 'core:home' %}">
+
           🎓 College ERP
         </a>
 
@@ -92,7 +90,8 @@
               </li>
               <li><hr class="dropdown-divider" /></li>
               <li>
-                <a class="dropdown-item" href="{% url 'logout' %}">Logout</a>
+                <a class="dropdown-item" href="{% url 'core:logout' %}">Logout</a>
+
               </li>
             </ul>
           </div>
