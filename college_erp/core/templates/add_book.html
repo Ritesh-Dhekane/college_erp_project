@@ -1,10 +1,70 @@
 {% extends "base.html" %}
+{% block title %}Add Book{% endblock %}
+{% block sidebar %}{% include 'sidebar.html' %}{% endblock %}
 {% block content %}
-  <h2>Add Book</h2>
-  <form method="post">
-    {% csrf_token %}
-    <label>Title: <input type="text" name="title" required></label><br>
-    <label>Author: <input type="text" name="author"></label><br>
-    <button type="submit">Add</button>
-  </form>
+<div class="container">
+  <div class="row">
+    <div class="col-lg-5">
+      <div class="card shadow-sm mb-4">
+        <div class="card-header bg-primary text-white">Add Book</div>
+        <div class="card-body">
+          <form method="post">
+            {% csrf_token %}
+            <div class="mb-3">
+              <label class="form-label">Title</label>
+              <input type="text" class="form-control" name="title" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Author</label>
+              <input type="text" class="form-control" name="author">
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Total Copies</label>
+              <input type="number" class="form-control" name="copies_total" min="1" value="1">
+            </div>
+            <div class="d-grid">
+              <button type="submit" class="btn btn-primary">Add Book</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-7">
+      <div class="card shadow-sm">
+        <div class="card-header bg-light">Existing Books</div>
+        <div class="card-body">
+          {% if books %}
+          <div class="table-responsive">
+            <table class="table table-striped align-middle">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Title</th>
+                  <th>Author</th>
+                  <th>Total</th>
+                  <th>Available</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for b in books %}
+                <tr>
+                  <td>{{ forloop.counter }}</td>
+                  <td>{{ b.title }}</td>
+                  <td>{{ b.author }}</td>
+                  <td>{{ b.copies_total }}</td>
+                  <td>{{ b.copies_available }}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          {% else %}
+            <p class="text-muted">No books added yet.</p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock %}

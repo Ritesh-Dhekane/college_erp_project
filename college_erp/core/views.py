@@ -5,9 +5,39 @@ from .models import User, Book, BookIssue  # ensure these models exist in core/m
 from django.contrib import messages
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
 from django.contrib.auth.decorators import login_required
+from django.db import models # Added missing import for models
+
+
+def role_required(required_role: str):
+    """Decorator to restrict a view to users with a specific role."""
+    def decorator(view_func):
+        @login_required
+        def _wrapped(request, *args, **kwargs):
+            if getattr(request.user, "role", None) != required_role:
+                messages.error(request, "You do not have permission to access this page.")
+                return redirect("core:home")
+            return view_func(request, *args, **kwargs)
+        return _wrapped
+    return decorator
+
 
 def home(request):
+    # If already authenticated, redirect to relevant dashboard
+    if request.user.is_authenticated:
+        role = getattr(request.user, 'role', None)
+        if role == 'student':
+            return redirect('core:student_dashboard')
+        if role == 'teacher':
+            return redirect('core:teacher_dashboard')
+        if role == 'admin':
+            return redirect('core:admin_dashboard')
+        if role == 'clerk':
+            return redirect('core:clerk_dashboard')
+        if role == 'librarian':
+            return redirect('core:librarian_dashboard')
+        return redirect('core:home')
     return render(request, 'home.html', {'year': datetime.now().year})
+
 
 def register(request):
     if request.method == "POST":
@@ -78,11 +108,14 @@ def login_view(request):
 
     return render(request, 'login.html')
 
+
 def dashboard(request):
     return render(request, 'dashboard.html')
 
+
 def library(request):
     return render(request, 'library.html')
+
 
 def logout_view(request):
     auth_logout(request)
@@ -108,9 +141,50 @@ def admin_dashboard(request):
 def clerk_dashboard(request):
     return render(request, 'dashboard/clerk.html', {'user': request.user})
 
-@login_required
+@role_required('librarian')
 def librarian_dashboard(request):
-    return render(request, 'dashboard/librarian.html', {'user': request.user})
+    # Compute quick stats
+    try:
+        total_books = Book.objects.count()
+    except Exception:
+        total_books = 0
+
+    try:
+        issued_books = BookIssue.objects.filter(action='issued').count()
+    except Exception:
+        issued_books = 0
+
+    try:
+        students_count = User.objects.filter(role='student').count()
+    except Exception:
+        students_count = 0
+
+    # Recent transactions (map issued_at to 'date' key for template)
+    try:
+        recent = (
+            BookIssue.objects.select_related('book', 'student')
+            .order_by('-issued_at')[:10]
+        )
+        transactions = [
+            {
+                'book': bi.book,
+                'student': bi.student,
+                'action': bi.action,
+                'date': bi.issued_at,
+            }
+            for bi in recent
+        ]
+    except Exception:
+        transactions = []
+
+    context = {
+        'user': request.user,
+        'total_books': total_books,
+        'issued_books': issued_books,
+        'students_count': students_count,
+        'transactions': transactions,
+    }
+    return render(request, 'dashboard/librarian.html', context)
 
 # ----------------------------
 # Library related views below
@@ -141,7 +215,7 @@ def all_book_issue_history(request):
 # Missing view stubs that caused your server to crash
 # ----------------------------
 
-@login_required
+@role_required('librarian')
 def add_book(request):
     """
     Simple add-book view stub.
@@ -153,20 +227,34 @@ def add_book(request):
         author = request.POST.get('author')
         if title:
             try:
-                Book.objects.create(title=title, author=author or "")
-                messages.success(request, "Book added.")
-                return redirect('core:library')
+                copies_total_str = request.POST.get('copies_total')
+                try:
+                    copies_total = int(copies_total_str) if copies_total_str else 1
+                    if copies_total < 1:
+                        copies_total = 1
+                except ValueError:
+                    copies_total = 1
+
+                book = Book.objects.create(
+                    title=title,
+                    author=author or "",
+                    copies_total=copies_total,
+                    copies_available=copies_total,
+                )
+                messages.success(request, f"Book '{book.title}' added successfully.")
+                return redirect('core:add-book')
             except Exception as e:
                 messages.error(request, f"Could not create book: {e}")
         else:
             messages.error(request, "Title is required.")
     # Render a simple template (create core/templates/add_book.html) or redirect if template missing
     try:
-        return render(request, 'add_book.html')
+        books = Book.objects.all().order_by('title')
+        return render(request, 'add_book.html', { 'books': books })
     except Exception:
-        return redirect('core:library')
+        return redirect('core:librarian_dashboard')
 
-@login_required
+@role_required('librarian')
 def manage_issues(request):
     """
     Manage issues stub — list all issues and optionally mark returned.
@@ -179,4 +267,32 @@ def manage_issues(request):
     try:
         return render(request, 'manage_issues.html', {'issues': issues})
     except Exception:
-        return redirect('core:library')
+        return redirect('core:librarian_dashboard')
+
+@role_required('librarian')
+def available_books(request):
+    """List all books with copies info and issued counts."""
+    try:
+        # Efficiently prefetch related issues for counting
+        books = list(Book.objects.all())
+        # Build a map of book_id to issued count
+        issued_counts_qs = (
+            BookIssue.objects.filter(action='issued')
+            .values('book')
+            .order_by()
+            .annotate(count=models.Count('id'))
+        )
+        book_id_to_issued = {row['book']: row['count'] for row in issued_counts_qs}
+
+        rows = []
+        for book in books:
+            issued_count = book_id_to_issued.get(book.id, 0)
+            rows.append({
+                'book': book,
+                'copies_total': book.copies_total,
+                'copies_available': book.copies_available,
+                'copies_issued': issued_count,
+            })
+    except Exception:
+        rows = []
+    return render(request, 'available_books.html', { 'rows': rows })

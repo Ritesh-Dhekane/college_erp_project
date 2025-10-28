@@ -55,28 +55,28 @@ class Book(models.Model):
         return f"{self.title} — {self.author}"
 
 class BookIssue(models.Model):
-        """Tracks which user has which book and its status."""
+    """Tracks which user has which book and its status."""
 
-ACTION_CHOICES = [
+    ACTION_CHOICES = [
         ("issued", "Issued"),
         ("returned", "Returned"),
         ("lost", "Lost"),
     ]
 
-book = models.ForeignKey(Book, on_delete=models.CASCADE, related_name="issues")
-student = models.ForeignKey(
+    book = models.ForeignKey(Book, on_delete=models.CASCADE, related_name="issues")
+    student = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="book_issues"
     )
-action = models.CharField(max_length=10, choices=ACTION_CHOICES, default="issued")
-issued_at = models.DateTimeField(default=timezone.now)
-due_date = models.DateField(null=True, blank=True)
-returned_at = models.DateTimeField(null=True, blank=True)
-note = models.TextField(blank=True)
+    action = models.CharField(max_length=10, choices=ACTION_CHOICES, default="issued")
+    issued_at = models.DateTimeField(default=timezone.now)
+    due_date = models.DateField(null=True, blank=True)
+    returned_at = models.DateTimeField(null=True, blank=True)
+    note = models.TextField(blank=True)
 
-class Meta:
+    class Meta:
         ordering = ["-issued_at"]
         verbose_name = "Book Issue"
         verbose_name_plural = "Book Issues"
 
-def __str__(self):
+    def __str__(self):
         return f"{self.book.title} -> {self.student.username} ({self.action})"

@@ -3,16 +3,12 @@
 
 {% block title %}Librarian Dashboard{% endblock %}
 
+{% block sidebar %}{% include "sidebar.html" %}{% endblock %}
 {% block content %}
 <div class="container dashboard librarian-dashboard">
   <div class="row">
-    <!-- Sidebar (if you include a separate sidebar template) -->
-    <div class="col-md-3">
-      {% include "sidebar.html" %}
-    </div>
-
     <!-- Main content -->
-    <div class="col-md-9">
+    <div class="col-md-12">
       <h1 class="mt-2">Librarian Dashboard</h1>
 
       <!-- Quick stats -->
@@ -71,9 +67,10 @@
       </div>
 
       <!-- Optional section for actions -->
-      <div class="my-3">
-        <a class="btn btn-primary" href="{% url 'core:add-book' %}">Add new book</a>
-        <a class="btn btn-secondary" href="{% url 'core:manage-issues' %}">Manage issues</a>
+      <div class="my-3 d-flex gap-2">
+        <a class="btn btn-primary" href="{% url 'core:books_add' %}">Add new book</a>
+        <a class="btn btn-outline-primary" href="{% url 'core:books_list' %}">Available books</a>
+        <a class="btn btn-secondary" href="{% url 'core:issues_manage' %}">Manage issues</a>
       </div>
     </div>
   </div>

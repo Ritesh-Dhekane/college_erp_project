@@ -22,11 +22,13 @@ urlpatterns = [
     # Library management URLs
     path('library/my-books/', views.student_issued_books, name='student_issued_books'),
     path('library/all-issues/', views.all_book_issue_history, name='all_book_issue_history'),
+    path('library/available-books/', views.available_books, name='available_books'),
 
 
     # Helpful endpoints referenced from templates (add if missing in views.py)
-    path('books/add/', views.add_book, name='add-book'),
-    path('issues/manage/', views.manage_issues, name='manage-issues'),
+    path('books/add/', views.add_book, name='books_add'),
+    path('books/', views.available_books, name='books_list'),
+    path('issues/manage/', views.manage_issues, name='issues_manage'),
 
     path('profile/', views.profile, name='profile'),
 ]
