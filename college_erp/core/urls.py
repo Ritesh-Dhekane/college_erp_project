@@ -23,6 +23,7 @@ urlpatterns = [
     path('library/my-books/', views.student_issued_books, name='student_issued_books'),
     path('library/all-issues/', views.all_book_issue_history, name='all_book_issue_history'),
     path('library/available-books/', views.available_books, name='available_books'),
+    path('books/issue/<int:book_id>/', views.issue_book, name='issue_book'),
 
 
     # Helpful endpoints referenced from templates (add if missing in views.py)

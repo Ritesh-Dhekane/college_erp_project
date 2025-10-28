@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}Issue Book{% endblock %}
+{% block sidebar %}{% include 'sidebar.html' %}{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+          <h4 class="mb-0">Issue Book</h4>
+        </div>
+        <div class="card-body">
+          <!-- Book Info -->
+          <div class="mb-4">
+            <h5>Book Details</h5>
+            <div class="row">
+              <div class="col-md-6">
+                <p><strong>Title:</strong> {{ book.title }}</p>
+                <p><strong>Author:</strong> {{ book.author }}</p>
+              </div>
+              <div class="col-md-6">
+                <p><strong>Total Copies:</strong> {{ book.copies_total }}</p>
+                <p><strong>Available:</strong> {{ book.copies_available }}</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Issue Form -->
+          <form method="post">
+            {% csrf_token %}
+            <div class="mb-3">
+              <label for="student_email" class="form-label">Student Email</label>
+              <select class="form-select" name="student_email" id="student_email" required>
+                <option value="">Select a student...</option>
+                {% for student in students %}
+                  <option value="{{ student.username }}">{{ student.get_full_name|default:student.username }} ({{ student.username }})</option>
+                {% endfor %}
+              </select>
+            </div>
+            
+            <div class="mb-3">
+              <label for="due_date" class="form-label">Due Date (Optional)</label>
+              <input type="date" class="form-control" name="due_date" id="due_date">
+              <div class="form-text">Leave blank for default 14 days from today</div>
+            </div>
+
+            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+              <a href="{% url 'core:books_list' %}" class="btn btn-secondary me-md-2">Cancel</a>
+              <button type="submit" class="btn btn-primary">Issue Book</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

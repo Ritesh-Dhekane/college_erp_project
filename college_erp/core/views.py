@@ -296,3 +296,74 @@ def available_books(request):
     except Exception:
         rows = []
     return render(request, 'available_books.html', { 'rows': rows })
+
+
+@role_required('librarian')
+def issue_book(request, book_id):
+    """Issue a book to a student."""
+    try:
+        book = Book.objects.get(id=book_id)
+    except Book.DoesNotExist:
+        messages.error(request, "Book not found.")
+        return redirect('core:books_list')
+    
+    if request.method == "POST":
+        student_email = request.POST.get('student_email')
+        due_date_str = request.POST.get('due_date')
+        
+        if not student_email:
+            messages.error(request, "Student email is required.")
+            return render(request, 'issue_book.html', {'book': book, 'students': User.objects.filter(role='student')})
+        
+        try:
+            student = User.objects.get(username=student_email, role='student')
+        except User.DoesNotExist:
+            messages.error(request, "Student not found.")
+            return render(request, 'issue_book.html', {'book': book, 'students': User.objects.filter(role='student')})
+        
+        # Check if book is available
+        if book.copies_available <= 0:
+            messages.error(request, "No copies available for this book.")
+            return render(request, 'issue_book.html', {'book': book, 'students': User.objects.filter(role='student')})
+        
+        # Check if student already has this book issued
+        existing_issue = BookIssue.objects.filter(
+            book=book, 
+            student=student, 
+            action='issued'
+        ).exists()
+        
+        if existing_issue:
+            messages.error(request, f"{student.get_full_name()} already has this book issued.")
+            return render(request, 'issue_book.html', {'book': book, 'students': User.objects.filter(role='student')})
+        
+        # Create the issue
+        try:
+            from datetime import datetime, timedelta
+            due_date = None
+            if due_date_str:
+                due_date = datetime.strptime(due_date_str, '%Y-%m-%d').date()
+            else:
+                # Default due date: 14 days from now
+                due_date = datetime.now().date() + timedelta(days=14)
+            
+            BookIssue.objects.create(
+                book=book,
+                student=student,
+                action='issued',
+                due_date=due_date
+            )
+            
+            # Update available copies
+            book.copies_available -= 1
+            book.save()
+            
+            messages.success(request, f"Book '{book.title}' issued to {student.get_full_name()} successfully.")
+            return redirect('core:books_list')
+            
+        except Exception as e:
+            messages.error(request, f"Error issuing book: {e}")
+    
+    # GET request - show form
+    students = User.objects.filter(role='student').order_by('first_name', 'last_name')
+    return render(request, 'issue_book.html', {'book': book, 'students': students})

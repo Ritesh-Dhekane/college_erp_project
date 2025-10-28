@@ -15,6 +15,7 @@
           <th>Total Copies</th>
           <th>Issued</th>
           <th>Available</th>
+          <th>Actions</th>
         </tr>
       </thead>
       <tbody>
@@ -26,6 +27,13 @@
           <td>{{ r.copies_total }}</td>
           <td>{{ r.copies_issued }}</td>
           <td>{{ r.copies_available }}</td>
+          <td>
+            {% if r.copies_available > 0 %}
+              <a href="{% url 'core:issue_book' r.book.id %}" class="btn btn-sm btn-primary">Issue</a>
+            {% else %}
+              <span class="text-muted">Unavailable</span>
+            {% endif %}
+          </td>
         </tr>
         {% endfor %}
       </tbody>
