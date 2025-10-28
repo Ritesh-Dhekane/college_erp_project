@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Book Issue History{% endblock %}
+{% block sidebar %}{% include 'sidebar.html' %}{% endblock %}
+{% block content %}
+<div class="container">
+  <h2 class="mb-3">Book Issue History</h2>
+  {% if issues %}
+  <div class="table-responsive">
+    <table class="table table-striped align-middle">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Book</th>
+          <th>Student</th>
+          <th>Action</th>
+          <th>Issued At</th>
+          <th>Due Date</th>
+          <th>Returned At</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for i in issues %}
+        <tr>
+          <td>{{ forloop.counter }}</td>
+          <td>{{ i.book.title }}</td>
+          <td>{{ i.student.get_full_name|default:i.student.username }}</td>
+          <td>{{ i.action|capfirst }}</td>
+          <td>{{ i.issued_at|date:"Y-m-d H:i" }}</td>
+          <td>{{ i.due_date|default:'—' }}</td>
+          <td>{{ i.returned_at|date:"Y-m-d H:i"|default:'—' }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+    <p class="text-muted">No issue records found.</p>
+  {% endif %}
+</div>
+{% endblock %}
+
+

@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}My Issued Books{% endblock %}
+{% block sidebar %}{% include 'sidebar.html' %}{% endblock %}
+{% block content %}
+<div class="container">
+  <h2 class="mb-3">My Issued Books</h2>
+  {% if books %}
+  <div class="table-responsive">
+    <table class="table table-striped align-middle">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Book</th>
+          <th>Action</th>
+          <th>Issued At</th>
+          <th>Due Date</th>
+          <th>Returned At</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for i in books %}
+        <tr>
+          <td>{{ forloop.counter }}</td>
+          <td>{{ i.book.title }}</td>
+          <td>{{ i.action|capfirst }}</td>
+          <td>{{ i.issued_at|date:"Y-m-d H:i" }}</td>
+          <td>{{ i.due_date|default:'—' }}</td>
+          <td>{{ i.returned_at|date:"Y-m-d H:i"|default:'—' }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+    <p class="text-muted">No issued books found.</p>
+  {% endif %}
+</div>
+{% endblock %}
+
+

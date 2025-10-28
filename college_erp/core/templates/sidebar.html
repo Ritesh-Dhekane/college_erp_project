@@ -49,20 +49,24 @@ Dynamic sidebar for logged-in users.
         </div>
       </li>
       {% elif request.user.role == 'librarian' %}
+      {% url 'core:books_list' as books_list_url %}
+      {% url 'core:books_add' as books_add_url %}
+      {% url 'core:all_book_issue_history' as issues_history_url %}
       <li class="nav-item mb-2">
-        <a class="nav-link text-dark" data-bs-toggle="collapse" href="#libraryMenuLibrarian" role="button" aria-expanded="false" aria-controls="libraryMenuLibrarian">
-          <i class="bi bi-book me-2"></i> Library
+        <a class="nav-link text-dark d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#libraryMenuLibrarian" role="button" aria-controls="libraryMenuLibrarian" aria-expanded="{% if request.path == books_list_url or request.path == books_add_url or request.path == issues_history_url %}true{% else %}false{% endif %}">
+          <span><i class="bi bi-book me-2"></i> Library</span>
+          <i class="bi {% if request.path == books_list_url or request.path == books_add_url or request.path == issues_history_url %}bi-chevron-up{% else %}bi-chevron-down{% endif %}"></i>
         </a>
-        <div class="collapse" id="libraryMenuLibrarian">
+        <div class="collapse {% if request.path == books_list_url or request.path == books_add_url or request.path == issues_history_url %}show{% endif %}" id="libraryMenuLibrarian">
           <ul class="nav flex-column ms-3">
             <li class="nav-item">
-              <a href="{% url 'core:books_list' %}" class="nav-link text-dark">Available Books</a>
+              <a href="{{ books_list_url }}" class="nav-link text-dark">Available Books</a>
             </li>
             <li class="nav-item">
-              <a href="{% url 'core:all_book_issue_history' %}" class="nav-link text-dark">Book Issue History</a>
+              <a href="{{ issues_history_url }}" class="nav-link text-dark">Book Issue History</a>
             </li>
             <li class="nav-item">
-              <a href="{% url 'core:books_add' %}" class="nav-link text-dark">Add Book</a>
+              <a href="{{ books_add_url }}" class="nav-link text-dark">Add Book</a>
             </li>
           </ul>
         </div>
