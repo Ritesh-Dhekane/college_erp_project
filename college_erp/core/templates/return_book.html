@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block title %}Return Book{% endblock %}
+{% block sidebar %}{% include 'sidebar.html' %}{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="card shadow-sm">
+        <div class="card-header bg-warning text-dark">
+          <h4 class="mb-0">Return Book</h4>
+        </div>
+        <div class="card-body">
+          <!-- Issue Details -->
+          <div class="mb-4">
+            <h5>Issue Details</h5>
+            <div class="row">
+              <div class="col-md-6">
+                <p><strong>Book:</strong> {{ issue.book.title }}</p>
+                <p><strong>Author:</strong> {{ issue.book.author }}</p>
+                <p><strong>Student:</strong> {{ issue.student.get_full_name|default:issue.student.username }}</p>
+              </div>
+              <div class="col-md-6">
+                <p><strong>Issued Date:</strong> {{ issue.issued_at|date:"Y-m-d H:i" }}</p>
+                <p><strong>Due Date:</strong> {{ issue.due_date|date:"Y-m-d" }}</p>
+                {% if issue.is_overdue %}
+                  <p class="text-danger"><strong>Status:</strong> Overdue</p>
+                  <p class="text-danger"><strong>Fine:</strong> ${{ issue.calculate_fine|floatformat:2 }}</p>
+                {% else %}
+                  <p class="text-success"><strong>Status:</strong> On Time</p>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+
+          <!-- Return Form -->
+          <form method="post">
+            {% csrf_token %}
+            <div class="alert alert-info">
+              <strong>Note:</strong> This action will mark the book as returned and update the available copies.
+              {% if issue.is_overdue %}
+                A fine of ${{ issue.calculate_fine|floatformat:2 }} will be applied for overdue return.
+              {% endif %}
+            </div>
+
+            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+              <a href="{% url 'core:all_book_issue_history' %}" class="btn btn-secondary me-md-2">Cancel</a>
+              <button type="submit" class="btn btn-warning">Confirm Return</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

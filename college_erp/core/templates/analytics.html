@@ -1,0 +1,170 @@
+{% extends "base.html" %}
+{% block title %}Analytics Dashboard{% endblock %}
+{% block sidebar %}{% include 'sidebar.html' %}{% endblock %}
+{% block content %}
+<div class="container-fluid">
+  <h2 class="mb-4">Library Analytics Dashboard</h2>
+  
+  <!-- Key Metrics Cards -->
+  <div class="row mb-4">
+    <div class="col-md-2">
+      <div class="card bg-primary text-white">
+        <div class="card-body text-center">
+          <h3>{{ total_books }}</h3>
+          <p class="mb-0">Total Books</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-2">
+      <div class="card bg-success text-white">
+        <div class="card-body text-center">
+          <h3>{{ active_issues }}</h3>
+          <p class="mb-0">Active Issues</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-2">
+      <div class="card bg-warning text-white">
+        <div class="card-body text-center">
+          <h3>{{ overdue_books }}</h3>
+          <p class="mb-0">Overdue Books</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-2">
+      <div class="card bg-info text-white">
+        <div class="card-body text-center">
+          <h3>{{ total_students }}</h3>
+          <p class="mb-0">Total Students</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-2">
+      <div class="card bg-secondary text-white">
+        <div class="card-body text-center">
+          <h3>{{ active_students }}</h3>
+          <p class="mb-0">Active Students</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-2">
+      <div class="card bg-dark text-white">
+        <div class="card-body text-center">
+          <h3>{{ recent_issues }}</h3>
+          <p class="mb-0">Recent Issues</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Charts Row -->
+  <div class="row mb-4">
+    <div class="col-md-8">
+      <div class="card">
+        <div class="card-header">
+          <h5>Monthly Issue Trends</h5>
+        </div>
+        <div class="card-body">
+          <canvas id="monthlyChart" width="400" height="200"></canvas>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card">
+        <div class="card-header">
+          <h5>Activity Summary</h5>
+        </div>
+        <div class="card-body">
+          <div class="mb-3">
+            <div class="d-flex justify-content-between">
+              <span>Issues (30 days)</span>
+              <span class="badge bg-primary">{{ recent_issues }}</span>
+            </div>
+          </div>
+          <div class="mb-3">
+            <div class="d-flex justify-content-between">
+              <span>Returns (30 days)</span>
+              <span class="badge bg-success">{{ recent_returns }}</span>
+            </div>
+          </div>
+          <div class="mb-3">
+            <div class="d-flex justify-content-between">
+              <span>Total Transactions</span>
+              <span class="badge bg-info">{{ total_issues }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Popular Books -->
+  <div class="row">
+    <div class="col-md-12">
+      <div class="card">
+        <div class="card-header">
+          <h5>Most Popular Books</h5>
+        </div>
+        <div class="card-body">
+          {% if popular_books %}
+          <div class="table-responsive">
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th>Rank</th>
+                  <th>Book Title</th>
+                  <th>Author</th>
+                  <th>Times Issued</th>
+                  <th>Available Copies</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for book in popular_books %}
+                <tr>
+                  <td>{{ forloop.counter }}</td>
+                  <td>{{ book.title }}</td>
+                  <td>{{ book.author }}</td>
+                  <td>{{ book.issue_count }}</td>
+                  <td>{{ book.copies_available }}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          {% else %}
+          <p class="text-muted">No book issues recorded yet.</p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+// Monthly trends chart
+const ctx = document.getElementById('monthlyChart').getContext('2d');
+const monthlyChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+        labels: [{% for data in monthly_data %}'{{ data.month }}'{% if not forloop.last %},{% endif %}{% endfor %}],
+        datasets: [{
+            label: 'Books Issued',
+            data: [{% for data in monthly_data %}{{ data.count }}{% if not forloop.last %},{% endif %}{% endfor %}],
+            borderColor: 'rgb(75, 192, 192)',
+            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+            tension: 0.1
+        }]
+    },
+    options: {
+        responsive: true,
+        scales: {
+            y: {
+                beginAtZero: true
+            }
+        }
+    }
+});
+</script>
+{% endblock %}

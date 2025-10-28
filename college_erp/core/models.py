@@ -61,6 +61,7 @@ class BookIssue(models.Model):
         ("issued", "Issued"),
         ("returned", "Returned"),
         ("lost", "Lost"),
+        ("overdue", "Overdue"),
     ]
 
     book = models.ForeignKey(Book, on_delete=models.CASCADE, related_name="issues")
@@ -71,6 +72,7 @@ class BookIssue(models.Model):
     issued_at = models.DateTimeField(default=timezone.now)
     due_date = models.DateField(null=True, blank=True)
     returned_at = models.DateTimeField(null=True, blank=True)
+    fine_amount = models.DecimalField(max_digits=8, decimal_places=2, default=0.00)
     note = models.TextField(blank=True)
 
     class Meta:
@@ -80,3 +82,22 @@ class BookIssue(models.Model):
 
     def __str__(self):
         return f"{self.book.title} -> {self.student.username} ({self.action})"
+    
+    def is_overdue(self):
+        """Check if the book is overdue."""
+        if self.action == 'returned':
+            return False
+        if self.due_date:
+            from datetime import date
+            return date.today() > self.due_date
+        return False
+    
+    def calculate_fine(self):
+        """Calculate fine for overdue books."""
+        if not self.is_overdue():
+            return 0.00
+        
+        from datetime import date
+        days_overdue = (date.today() - self.due_date).days
+        # Fine: $1 per day overdue
+        return min(days_overdue * 1.00, 50.00)  # Max $50 fine

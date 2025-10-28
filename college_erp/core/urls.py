@@ -24,6 +24,8 @@ urlpatterns = [
     path('library/all-issues/', views.all_book_issue_history, name='all_book_issue_history'),
     path('library/available-books/', views.available_books, name='available_books'),
     path('books/issue/<int:book_id>/', views.issue_book, name='issue_book'),
+    path('books/return/<int:issue_id>/', views.return_book, name='return_book'),
+    path('analytics/', views.librarian_analytics, name='librarian_analytics'),
 
 
     # Helpful endpoints referenced from templates (add if missing in views.py)

@@ -16,6 +16,8 @@
           <th>Issued At</th>
           <th>Due Date</th>
           <th>Returned At</th>
+          <th>Fine</th>
+          <th>Actions</th>
         </tr>
       </thead>
       <tbody>
@@ -28,6 +30,20 @@
           <td>{{ i.issued_at|date:"Y-m-d H:i" }}</td>
           <td>{{ i.due_date|default:'—' }}</td>
           <td>{{ i.returned_at|date:"Y-m-d H:i"|default:'—' }}</td>
+          <td>
+            {% if i.fine_amount > 0 %}
+              <span class="text-danger">${{ i.fine_amount|floatformat:2 }}</span>
+            {% else %}
+              —
+            {% endif %}
+          </td>
+          <td>
+            {% if i.action == 'issued' %}
+              <a href="{% url 'core:return_book' i.id %}" class="btn btn-sm btn-warning">Return</a>
+            {% else %}
+              <span class="text-muted">Returned</span>
+            {% endif %}
+          </td>
         </tr>
         {% endfor %}
       </tbody>

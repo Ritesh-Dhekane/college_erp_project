@@ -367,3 +367,108 @@ def issue_book(request, book_id):
     # GET request - show form
     students = User.objects.filter(role='student').order_by('first_name', 'last_name')
     return render(request, 'issue_book.html', {'book': book, 'students': students})
+
+
+@role_required('librarian')
+def return_book(request, issue_id):
+    """Return a book."""
+    try:
+        issue = BookIssue.objects.get(id=issue_id, action='issued')
+    except BookIssue.DoesNotExist:
+        messages.error(request, "Issue record not found.")
+        return redirect('core:all_book_issue_history')
+    
+    if request.method == "POST":
+        try:
+            from datetime import datetime
+            
+            # Calculate fine if overdue
+            fine_amount = issue.calculate_fine()
+            
+            # Update the issue record
+            issue.action = 'returned'
+            issue.returned_at = datetime.now()
+            issue.fine_amount = fine_amount
+            issue.save()
+            
+            # Update book availability
+            issue.book.copies_available += 1
+            issue.book.save()
+            
+            if fine_amount > 0:
+                messages.warning(request, f"Book returned with fine: ${fine_amount:.2f}")
+            else:
+                messages.success(request, f"Book '{issue.book.title}' returned successfully.")
+            
+            return redirect('core:all_book_issue_history')
+            
+        except Exception as e:
+            messages.error(request, f"Error returning book: {e}")
+    
+    return render(request, 'return_book.html', {'issue': issue})
+
+
+@role_required('librarian')
+def librarian_analytics(request):
+    """Analytics dashboard for librarians."""
+    from datetime import datetime, timedelta
+    from django.db.models import Count, Q
+    
+    # Basic stats
+    total_books = Book.objects.count()
+    total_students = User.objects.filter(role='student').count()
+    total_issues = BookIssue.objects.count()
+    active_issues = BookIssue.objects.filter(action='issued').count()
+    overdue_books = BookIssue.objects.filter(
+        action='issued',
+        due_date__lt=datetime.now().date()
+    ).count()
+    
+    # Recent activity (last 30 days)
+    thirty_days_ago = datetime.now() - timedelta(days=30)
+    recent_issues = BookIssue.objects.filter(issued_at__gte=thirty_days_ago).count()
+    recent_returns = BookIssue.objects.filter(
+        returned_at__gte=thirty_days_ago,
+        action='returned'
+    ).count()
+    
+    # Popular books (most issued)
+    popular_books = Book.objects.annotate(
+        issue_count=Count('issues', filter=Q(issues__action='issued'))
+    ).order_by('-issue_count')[:5]
+    
+    # Monthly issue trends (last 6 months)
+    monthly_data = []
+    for i in range(6):
+        month_start = datetime.now() - timedelta(days=30*i)
+        month_end = month_start + timedelta(days=30)
+        count = BookIssue.objects.filter(
+            issued_at__gte=month_start,
+            issued_at__lt=month_end
+        ).count()
+        monthly_data.append({
+            'month': month_start.strftime('%b'),
+            'count': count
+        })
+    monthly_data.reverse()
+    
+    # Student activity
+    active_students = User.objects.filter(
+        role='student',
+        book_issues__action='issued'
+    ).distinct().count()
+    
+    context = {
+        'total_books': total_books,
+        'total_students': total_students,
+        'total_issues': total_issues,
+        'active_issues': active_issues,
+        'overdue_books': overdue_books,
+        'recent_issues': recent_issues,
+        'recent_returns': recent_returns,
+        'popular_books': popular_books,
+        'monthly_data': monthly_data,
+        'active_students': active_students,
+    }
+    
+    return render(request, 'analytics.html', context)
