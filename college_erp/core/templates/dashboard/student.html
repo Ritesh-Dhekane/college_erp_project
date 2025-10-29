@@ -1,9 +1,277 @@
 {% extends 'base.html' %}
+{% load static %}
 {% block title %}Student Dashboard{% endblock %}
 {% block sidebar %}{% include 'sidebar.html' %}{% endblock %}
 {% block content %}
-<div class="text-center mt-5">
-    <h1>Welcome, {{ user.first_name|default:user.username }}!</h1>
-    <p class="lead">You are logged in as a <strong>{{ user.role|capfirst }}</strong>.</p>
+
+<style>
+  /* === Dashboard Layout Fixes === */
+  .dashboard-container {
+    max-width: 100%;
+    margin-left: auto;
+    margin-right: 200px;
+  }
+
+  .card {
+    border-radius: 10px;
+  }
+
+  .card-header {
+    border-bottom: 1px solid #eee;
+  }
+
+  .content-area {
+    background-color: #f9f9fb;
+    min-height: 100vh;
+  }
+
+  table {
+    margin-bottom: 0;
+  }
+
+  /* Prevent horizontal overflow next to sidebar */
+  .container, .dashboard-container {
+    padding-left: 0;
+    padding-right: 0;
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  /* Responsive tweaks */
+  @media (max-width: 768px) {
+    .card .fs-4 {
+      font-size: 1.2rem;
+    }
+    .card .fs-3 {
+      font-size: 1.4rem;
+    }
+  }
+</style>
+
+<div class="container-fluid dashboard-container mt-4">
+
+  <!-- Header -->
+  <div class="text-center mb-4">
+    <h1>Welcome, {{ user.first_name|default:user.username }} 👋</h1>
+    <p class="lead text-muted">You are logged in as a <strong>{{ user.role|capfirst }}</strong>.</p>
+    <p id="date-time" class="small text-secondary"></p>
+    <blockquote class="blockquote mt-3">
+      <p id="quote" class="mb-0 fst-italic text-primary"></p>
+    </blockquote>
   </div>
+
+  <!-- Quick Summary Cards -->
+  <div class="row g-3 mb-4 text-center">
+    <div class="col-xl-3 col-md-6 col-sm-6">
+      <div class="card shadow-sm border-0 h-100">
+        <div class="card-body">
+          <i class="bi bi-book fs-3 text-primary"></i>
+          <h6 class="mt-2 fw-semibold text-muted">Issued Books</h6>
+          <p class="fs-4 mb-0">{{ issued_books.count }}</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-xl-3 col-md-6 col-sm-6">
+      <div class="card shadow-sm border-0 h-100">
+        <div class="card-body">
+          <i class="bi bi-cash-coin fs-3 text-success"></i>
+          <h6 class="mt-2 fw-semibold text-muted">Fees Pending</h6>
+          <p class="fs-4 mb-0">₹12,500</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-xl-3 col-md-6 col-sm-6">
+      <div class="card shadow-sm border-0 h-100">
+        <div class="card-body">
+          <i class="bi bi-journal-text fs-3 text-warning"></i>
+          <h6 class="mt-2 fw-semibold text-muted">Assignments Due</h6>
+          <p class="fs-4 mb-0">3</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-xl-3 col-md-6 col-sm-6">
+      <div class="card shadow-sm border-0 h-100">
+        <div class="card-body">
+          <i class="bi bi-graph-up-arrow fs-3 text-danger"></i>
+          <h6 class="mt-2 fw-semibold text-muted">Attendance</h6>
+          <p class="fs-4 mb-0">92%</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Today's Schedule -->
+  <div class="card mb-4 shadow-sm">
+    <div class="card-header bg-light">
+      <h5 class="mb-0"><i class="bi bi-calendar-event me-2"></i>Today's Schedule</h5>
+    </div>
+    <div class="card-body table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead>
+          <tr><th>Time</th><th>Subject</th><th>Faculty</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>9:00 AM</td><td>DBMS</td><td>Prof. Sharma</td></tr>
+          <tr><td>11:00 AM</td><td>Operating Systems</td><td>Dr. Iyer</td></tr>
+          <tr><td>2:00 PM</td><td>Python Programming</td><td>Ms. Singh</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Assignments Section -->
+  <div class="card mb-4 shadow-sm">
+    <div class="card-header bg-light">
+      <h5 class="mb-0"><i class="bi bi-pencil-square me-2"></i>Assignments</h5>
+    </div>
+    <div class="card-body table-responsive">
+      <table class="table table-striped align-middle mb-0">
+        <thead>
+          <tr><th>Subject</th><th>Title</th><th>Due Date</th><th>Status</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>DBMS</td><td>ER Diagram</td><td>Nov 2, 2025</td><td><span class="badge bg-warning text-dark">Pending</span></td></tr>
+          <tr><td>Python</td><td>Flask App</td><td>Nov 5, 2025</td><td><span class="badge bg-success">Submitted</span></td></tr>
+          <tr><td>Cloud Computing</td><td>Azure Data Pipeline</td><td>Nov 8, 2025</td><td><span class="badge bg-warning text-dark">Pending</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Notifications & Circulars -->
+  <div class="card mb-4 shadow-sm">
+    <div class="card-header bg-light">
+      <h5 class="mb-0"><i class="bi bi-megaphone me-2"></i>Notifications & Circulars</h5>
+    </div>
+    <div class="card-body">
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item">📢 Mid-Sem Exams start from <strong>Nov 10</strong>.</li>
+        <li class="list-group-item">💰 Fee payment portal open till <strong>Nov 5</strong>.</li>
+        <li class="list-group-item">📚 Library Book Fair from <strong>Nov 3–7</strong>.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Upcoming Events -->
+  <div class="row g-3 mb-4">
+    <div class="col-md-4">
+      <div class="card h-100 shadow-sm border-0">
+        <div class="card-body">
+          <h5 class="card-title">TechFest 2025</h5>
+          <p class="card-text">Join the college's annual technology festival.</p>
+          <p class="text-muted small mb-2">📅 Nov 15, 2025</p>
+          <a href="#" class="btn btn-outline-primary btn-sm">View Details</a>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card h-100 shadow-sm border-0">
+        <div class="card-body">
+          <h5 class="card-title">Hackathon</h5>
+          <p class="card-text">24-hour coding marathon with exciting prizes.</p>
+          <p class="text-muted small mb-2">📅 Nov 20, 2025</p>
+          <a href="#" class="btn btn-outline-primary btn-sm">View Details</a>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card h-100 shadow-sm border-0">
+        <div class="card-body">
+          <h5 class="card-title">Cultural Week</h5>
+          <p class="card-text">A week full of music, dance, and art events.</p>
+          <p class="text-muted small mb-2">📅 Dec 1–5, 2025</p>
+          <a href="#" class="btn btn-outline-primary btn-sm">View Details</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Academic Performance -->
+  <div class="card mb-4 shadow-sm">
+    <div class="card-header bg-light">
+      <h5 class="mb-0"><i class="bi bi-bar-chart-line me-2"></i>Academic Performance</h5>
+    </div>
+    <div class="card-body">
+      <canvas id="performanceChart" height="120"></canvas>
+    </div>
+  </div>
+
+  <!-- Library Section -->
+  <div class="card mb-4 shadow-sm">
+    <div class="card-header bg-light">
+      <h5 class="mb-0"><i class="bi bi-bookmark-check me-2"></i>Library - Issued Books</h5>
+    </div>
+    <div class="card-body table-responsive">
+      {% if issued_books %}
+        <table class="table table-bordered align-middle mb-0">
+          <thead><tr><th>Book Title</th><th>Issued Date</th><th>Due Date</th></tr></thead>
+          <tbody>
+            {% for book in issued_books %}
+              <tr>
+                <td>{{ book.title }}</td>
+                <td>{{ book.issue_date }}</td>
+                <td>{{ book.due_date }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      {% else %}
+        <p class="text-muted mb-0">No books currently issued.</p>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Quick Links -->
+  <div class="text-center mb-4">
+    <a href="#" class="btn btn-outline-secondary m-1"><i class="bi bi-calendar"></i> Timetable</a>
+    <a href="#" class="btn btn-outline-secondary m-1"><i class="bi bi-cash"></i> Fee Portal</a>
+    <a href="#" class="btn btn-outline-secondary m-1"><i class="bi bi-bar-chart"></i> Grades</a>
+    <a href="#" class="btn btn-outline-secondary m-1"><i class="bi bi-journal"></i> Library</a>
+  </div>
+</div>
+
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  // Date & Time
+  function updateDateTime() {
+    const now = new Date();
+    document.getElementById('date-time').innerText =
+      now.toLocaleString('en-IN', { dateStyle: 'full', timeStyle: 'short' });
+  }
+  setInterval(updateDateTime, 1000);
+  updateDateTime();
+
+  // Motivational Quote (Random Daily)
+  const quotes = [
+    "Success is no accident. It is hard work, perseverance, learning, and love for what you do.",
+    "Don’t watch the clock; do what it does. Keep going.",
+    "Dream big. Work hard. Stay humble.",
+    "The expert in anything was once a beginner.",
+    "Discipline is the bridge between goals and accomplishment.",
+    "Push yourself because no one else is going to do it for you."
+  ];
+  document.getElementById("quote").innerText = quotes[Math.floor(Math.random() * quotes.length)];
+
+  // Chart.js
+  const ctx = document.getElementById('performanceChart').getContext('2d');
+  new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: ['Sem 1', 'Sem 2', 'Sem 3', 'Sem 4'],
+      datasets: [{
+        label: 'GPA',
+        data: [8.2, 8.5, 8.8, 9.1],
+        borderWidth: 1,
+        backgroundColor: 'rgba(54, 162, 235, 0.6)',
+        borderColor: 'rgba(54, 162, 235, 1)'
+      }]
+    },
+    options: {
+      scales: { y: { beginAtZero: true, max: 10 } },
+      plugins: { legend: { display: false } }
+    }
+  });
+</script>
+
 {% endblock %}
