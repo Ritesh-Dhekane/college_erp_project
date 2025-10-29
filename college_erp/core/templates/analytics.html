@@ -4,7 +4,7 @@
 {% block content %}
 <div class="container-fluid">
   <h2 class="mb-4">Library Analytics Dashboard</h2>
-  
+
   <!-- Key Metrics Cards -->
   <div class="row mb-4">
     <div class="col-md-2">
@@ -65,7 +65,9 @@
           <h5>Monthly Issue Trends</h5>
         </div>
         <div class="card-body">
-          <canvas id="monthlyChart" width="400" height="200"></canvas>
+          <div style="height: 300px;">
+            <canvas id="monthlyChart"></canvas>
+          </div>
         </div>
       </div>
     </div>
@@ -143,28 +145,57 @@
 <!-- Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-// Monthly trends chart
-const ctx = document.getElementById('monthlyChart').getContext('2d');
-const monthlyChart = new Chart(ctx, {
+// guard: only run when canvas exists
+const canvas = document.getElementById('monthlyChart');
+if (canvas) {
+  const ctx = canvas.getContext('2d');
+
+  // destroy existing chart if re-rendered (prevents duplicate charts)
+  if (window._monthlyChartInstance) {
+    try { window._monthlyChartInstance.destroy(); } catch (e) { /* ignore */ }
+    window._monthlyChartInstance = null;
+  }
+
+  // build labels and numeric data safely using your Django template values
+const labels = JSON.parse(`[{% for data in monthly_data %}"{{ data.month }}"{% if not forloop.last %},{% endif %}{% endfor %}]`);
+const values = JSON.parse(`[{% for data in monthly_data %}{{ data.count }}{% if not forloop.last %},{% endif %}{% endfor %}]`);
+
+
+  window._monthlyChartInstance = new Chart(ctx, {
     type: 'line',
     data: {
-        labels: [{% for data in monthly_data %}'{{ data.month }}'{% if not forloop.last %},{% endif %}{% endfor %}],
-        datasets: [{
-            label: 'Books Issued',
-            data: [{% for data in monthly_data %}{{ data.count }}{% if not forloop.last %},{% endif %}{% endfor %}],
-            borderColor: 'rgb(75, 192, 192)',
-            backgroundColor: 'rgba(75, 192, 192, 0.2)',
-            tension: 0.1
-        }]
+      labels: labels,
+      datasets: [{
+        label: 'Books Issued',
+        data: values,
+        borderColor: 'rgb(75, 192, 192)',
+        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+        tension: 0.1,
+        borderWidth: 2,
+        pointRadius: 3,
+        pointHoverRadius: 5,
+        fill: true
+      }]
     },
     options: {
-        responsive: true,
-        scales: {
-            y: {
-                beginAtZero: true
-            }
-        }
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { display: true, position: 'top' },
+        tooltip: { enabled: true, mode: 'nearest' }
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          ticks: { precision: 0 }
+        },
+        x: { display: true }
+      },
+      animation: { duration: 400 }
     }
-});
+  });
+}
 </script>
+
 {% endblock %}
