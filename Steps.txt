@@ -12,5 +12,5 @@ Prject creation
 django-admin startproject college_erp
 
 Run project
-cd college_erp  
+cd config  
 python manage.py runserver

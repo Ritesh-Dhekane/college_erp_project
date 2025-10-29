@@ -20,7 +20,7 @@ django-admin --version
 ## 3. Create Project
 
 django-admin startproject college_erp
-cd college_erp
+cd config
 
 ## 4. Run Development Server
 
