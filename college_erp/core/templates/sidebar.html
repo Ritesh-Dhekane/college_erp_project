@@ -7,7 +7,8 @@ Dynamic sidebar for logged-in users.
 {% endcomment %}
 
 {% if request.user.is_authenticated %}
-<nav class="d-flex flex-column flex-shrink-0 bg-light vh-100 p-3 border-end" style="width: 250px;">
+<nav class="sidebar d-flex flex-column flex-shrink-0 bg-light vh-100 p-3 border-end d-none d-md-flex" style="width: 250px;">
+
   
   <!-- Hamburger for small screens -->
   <button class="btn btn-primary d-md-none mb-3" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarMenu">

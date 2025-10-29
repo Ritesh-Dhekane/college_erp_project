@@ -1,51 +1,293 @@
-body {
-    font-family: "Poppins", sans-serif;
-    background-color: #f8f9fa;
+/* ========= Base styles (kept your original look) ========= */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
 }
 
+html, body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden; /* prevent horizontal scrolling due to overflowing children */
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  font-family: "Poppins", sans-serif;
+  background-color: #f8f9fa;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Navbar & theme */
 .navbar {
-    background: linear-gradient(90deg, #0062e6, #33aeff);
+  background: linear-gradient(90deg, #0062e6, #33aeff);
 }
 
 .nav-link.active {
-    font-weight: 600;
-    text-decoration: underline;
+  font-weight: 600;
+  text-decoration: underline;
 }
 
+/* hero, cards, buttons */
 .hero-section {
-    background: #ffffff;
-    border-radius: 12px;
-    padding: 60px 20px;
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 60px 20px;
 }
 
 .card {
-    border: none;
+  border: none;
+  /* avoid cards causing horizontal overflow */
+  max-width: 100%;
 }
 
 .card-header {
-    font-size: 1.2rem;
+  font-size: 1.2rem;
 }
 
+/* Buttons */
 .btn-primary {
-    background: linear-gradient(90deg, #0062e6, #33aeff);
-    border: none;
-    transition: all 0.3s ease;
+  background: linear-gradient(90deg, #0062e6, #33aeff);
+  border: none;
+  transition: all 0.3s ease;
 }
 
 .btn-primary:hover {
-    background: linear-gradient(90deg, #0051c7, #1c91e6);
+  background: linear-gradient(90deg, #0051c7, #1c91e6);
 }
 
+/* main content area for flex layout */
 .content-area {
-    min-height: 0;
-    overflow: auto;
-    padding-bottom: 3.5rem;
+  min-height: 0;
+  overflow: auto;
+  padding-bottom: 3.5rem;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  max-width: 100%;
 }
 
+/* footer */
 footer {
-    flex-shrink: 0;
+  flex-shrink: 0;
 }
+
 .footer-link:hover {
-    color: #0d6efd;
-    text-decoration: underline;
+  color: #0d6efd;
+  text-decoration: underline;
+}
+
+/* ========= Responsive / overflow fixes ========= */
+
+/* Allow flex children to shrink (important when inside .d-flex wrapper) */
+.d-flex, .d-flex > * {
+  min-width: 0;
+}
+
+/* Sidebar (if present) should not force page width */
+.sidebar {
+  min-width: 0;
+  max-width: 100%;
+  overflow: auto;
+}
+
+/* Make media, canvas and tables responsive */
+img, video, svg, canvas {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Ensure chart canvas doesn't force overflow */
+.card-body > div > canvas,
+canvas {
+  max-width: 100% !important;
+  width: 100% !important;
+  height: auto !important;
+}
+
+/* Table responsive improvement */
+.table-responsive {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Remove any accidental large fixed widths */
+[class*="w-100"] {
+  max-width: 100%;
+}
+
+/* Prevent Bootstrap row negative margins causing tiny overflow on very small screens */
+.row {
+  margin-left: 0;
+  margin-right: 0;
+}
+
+/* Small touch target / spacing improvements */
+.card,
+.card-body {
+  word-break: break-word;
+}
+
+/* ========================= */
+/* 📱 Responsive Adjustments */
+/* ========================= */
+
+/* For tablets and smaller (≤ 768px) */
+@media (max-width: 768px) {
+  .navbar-brand {
+    font-size: 1.1rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .navbar .btn {
+    padding: 4px 10px;
+    font-size: 0.9rem;
+  }
+
+  .hero-section {
+    padding: 28px 14px;
+    text-align: center;
+    border-radius: 10px;
+  }
+
+  .card {
+    margin-bottom: 0.9rem;
+  }
+
+  .card-header {
+    font-size: 1rem;
+  }
+
+  main {
+    padding: 1rem !important;
+  }
+
+  .content-area {
+    padding-bottom: 2rem;
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+  }
+
+  footer .container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.4rem;
+    text-align: center;
+  }
+
+  footer p,
+  footer a {
+    font-size: 0.85rem;
+  }
+
+  /* reduce large horizontal paddings on containers */
+  .container, .container-fluid {
+    padding-left: 0.6rem;
+    padding-right: 0.6rem;
+  }
+
+  /* Chart container height adjustment so it fits nicely on small screens */
+  .card-body > div {
+    height: 240px; /* adjust as needed */
+  }
+
+  /* avoid table text wrapping causing overflow */
+  table {
+    table-layout: fixed;
+    width: 100%;
+    word-wrap: break-word;
+  }
+}
+
+/* For very small devices (≤ 576px) */
+@media (max-width: 576px) {
+  body {
+    font-size: 0.95rem;
+  }
+
+  .navbar {
+    padding: 0.4rem 0.6rem;
+  }
+
+  .navbar-brand {
+    font-size: 0.98rem;
+  }
+
+  .card-body {
+    padding: 0.6rem;
+  }
+
+  .btn,
+  .dropdown-item {
+    font-size: 0.82rem;
+  }
+
+  .card h3 {
+    font-size: 1.15rem;
+  }
+
+  h2 {
+    font-size: 1.05rem;
+    margin-bottom: 0.5rem;
+  }
+
+  h5 {
+    font-size: 0.95rem;
+  }
+
+  .table-responsive {
+    font-size: 0.82rem;
+    padding-bottom: 0.25rem;
+  }
+
+  /* further tighten chart height on small phones */
+  .card-body > div {
+    height: 200px;
+  }
+}
+
+/* ========================= */
+/* Optional utility fixes */
+/* ========================= */
+
+/* If you still see overflow use this debug helper briefly to find offender:
+Uncomment to show which elements are wider than the viewport.
+   .debug-overflow * { outline: 1px solid rgba(255,0,0,0.15); } */
+
+/* Always keep max-width on root containers to viewport */
+.container, .container-fluid {
+  max-width: 100%;
+}
+
+/* ========== Floating Sidebar on Small Screens ========== */
+.sidebar-float {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 250px;
+  height: 100vh;
+  background: #fff;
+  z-index: 1050;
+  box-shadow: 2px 0 10px rgba(0,0,0,0.2);
+  overflow-y: auto;
+  transition: transform 0.3s ease;
+}
+
+.sidebar-float .collapse.show {
+  display: block !important;
+}
+
+.sidebar-static {
+  position: relative;
+}
+
+/* When sidebar is hidden (Bootstrap collapse = hidden) */
+.sidebar-float .collapse:not(.show) {
+  display: none !important;
 }
