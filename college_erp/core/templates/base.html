@@ -43,53 +43,57 @@
 </head>
 
 <body>
-  <!-- Navbar -->
-  <nav class="navbar navbar-expand-lg navbar-dark bg-gradient-primary shadow-sm">
-    <div class="container-fluid d-flex justify-content-between align-items-center px-4">
-      <!-- Left: Logo + Project Name -->
+
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-gradient-primary shadow-sm">
+  <div class="container-fluid d-flex justify-content-between align-items-center px-4">
+    <div class="d-flex align-items-center">
+      {% if request.user.is_authenticated %}
+        <!-- Sidebar reopen button (visible on md+ screens) -->
+        <button id="sidebarReopenBtn" class="btn btn-outline-light btn-sm me-3 d-none d-md-inline-flex align-items-center" type="button" aria-label="Open sidebar">
+          <i class="bi bi-list"></i>
+        </button>
+      {% endif %}
+
+      <!-- Logo + Project Name -->
       <a class="navbar-brand fw-bold d-flex align-items-center" href="{% url 'core:home' %}">
         🎓 College ERP
       </a>
+    </div>
 
-      <!-- Right: Profile / Login-Register -->
-      <div>
-        {% if request.user.is_authenticated %}
+    <!-- Right: Profile / Login-Register -->
+    <div class="d-flex align-items-center">
+      {% if request.user.is_authenticated %}
         <!-- Profile dropdown -->
         <div class="dropdown">
           <a class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" href="#" role="button"
             id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-            <div class="rounded-circle bg-white text-primary d-flex justify-content-center align-items-center" style="
-                                    width: 40px;
-                                    height: 40px;
-                                    font-weight: 600;
-                                ">
+            <div class="rounded-circle bg-white text-primary d-flex justify-content-center align-items-center"
+                 style="width: 40px; height: 40px; font-weight: 600;">
               {{ request.user.first_name|first|upper }}
             </div>
           </a>
           <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
             <li class="dropdown-item-text fw-bold">
-              {{ request.user.first_name }} {{
-              request.user.last_name }}
+              {{ request.user.first_name }} {{ request.user.last_name }}
             </li>
             <li class="dropdown-item-text text-muted">
               {{ request.user.role|capfirst }}
             </li>
-            <li>
-              <hr class="dropdown-divider" />
-            </li>
-            <li>
-              <a class="dropdown-item" href="{% url 'core:logout' %}">Logout</a>
-            </li>
+            <li><hr class="dropdown-divider" /></li>
+            <li><a class="dropdown-item" href="{% url 'core:logout' %}">Logout</a></li>
           </ul>
         </div>
-        {% else %}
+      {% else %}
         <!-- Login / Register buttons -->
         <a href="{% url 'core:login' %}" class="btn btn-outline-light me-2">Login</a>
         <a href="{% url 'core:register' %}" class="btn btn-light">Register</a>
-        {% endif %}
-      </div>
+      {% endif %}
     </div>
-  </nav>
+  </div>
+</nav>
+
+
 
   <div class="d-flex flex-grow-1 position-relative">
 
@@ -151,5 +155,54 @@
     handleResize();
   });
 </script>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const sidebarMenu = document.getElementById("sidebarMenu");
+    const sidebar = sidebarMenu ? sidebarMenu.closest("nav") : null;
+    const reopenBtn = document.getElementById("sidebarReopenBtn");
+
+    if (!sidebarMenu || !sidebar) return;
+
+    function getCollapse() {
+      return bootstrap.Collapse.getOrCreateInstance(sidebarMenu, { toggle: false });
+    }
+
+    // Reopen button for desktop
+    if (reopenBtn) {
+      reopenBtn.addEventListener("click", function (e) {
+        e.preventDefault();
+        getCollapse().show();
+        sidebar.classList.remove("sidebar-collapsed");
+      });
+    }
+
+    // Resize handling for mobile floating sidebar
+    function handleResize() {
+      if (window.innerWidth <= 768) {
+        sidebar.classList.add("sidebar-float");
+        sidebar.classList.remove("sidebar-static");
+        if (sidebarMenu.classList.contains("show")) {
+          const collapseInstance = bootstrap.Collapse.getOrCreateInstance(sidebarMenu);
+          collapseInstance.hide();
+        }
+      } else {
+        sidebar.classList.remove("sidebar-float");
+        sidebar.classList.add("sidebar-static");
+      }
+    }
+
+    // Auto-close sidebar on mobile link click
+    sidebar.addEventListener("click", function (e) {
+      if (window.innerWidth <= 768 && e.target.closest("a.nav-link")) {
+        const collapseInstance = bootstrap.Collapse.getOrCreateInstance(sidebarMenu);
+        collapseInstance.hide();
+      }
+    });
+
+    window.addEventListener("resize", handleResize);
+    handleResize();
+  });
+</script>
+
 
 </html>

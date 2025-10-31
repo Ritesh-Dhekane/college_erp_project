@@ -1,25 +1,28 @@
 {% comment %}
 Dynamic sidebar for logged-in users.
 - Full height
-- Collapsible on small screens via hamburger
+- Collapsible on small screens
 - Role-based menu
-- Safe: does not crash if URLs are not yet implemented
 {% endcomment %}
 
 {% if request.user.is_authenticated %}
-<nav class="sidebar d-flex flex-column flex-shrink-0 bg-light vh-100 p-3 border-end d-none d-md-flex" style="width: 250px;">
+<nav id="appSidebar" class="sidebar d-flex flex-column flex-shrink-0 bg-light vh-100 p-3 border-end d-none d-md-flex"
+  style="width: 250px;">
 
-  
-  <!-- Hamburger for small screens -->
-  <button class="btn btn-primary d-md-none mb-3" type="button" data-bs-toggle="collapse" data-bs-target="#sidebarMenu">
-    <i class="bi bi-list"></i>
-  </button>
+  <!-- Desktop Close Button (visible md+) -->
+  <div class="d-flex justify-content-end mb-2">
+    <button id="sidebarCloseBtn" class="btn btn-sm btn-outline-secondary d-none d-md-inline-flex" type="button"
+      aria-label="Close sidebar">
+      <i class="bi bi-x-lg"></i>
+    </button>
+  </div>
 
   <div class="collapse d-md-block" id="sidebarMenu">
 
     <!-- Profile circle -->
     <div class="mb-4 text-center">
-      <div class="rounded-circle bg-primary text-white d-flex justify-content-center align-items-center mx-auto" style="width:60px; height:60px; font-size:1.5rem;">
+      <div class="rounded-circle bg-primary text-white d-flex justify-content-center align-items-center mx-auto"
+        style="width:60px; height:60px; font-size:1.5rem;">
         {{ request.user.first_name|first|upper }}
       </div>
       <h6 class="mt-2 mb-0">{{ request.user.first_name }} {{ request.user.last_name }}</h6>
@@ -28,9 +31,52 @@ Dynamic sidebar for logged-in users.
 
     <!-- Menu -->
     <ul class="nav nav-pills flex-column mb-auto">
-      <!-- Common -->
+
+      {# Dashboard (role-aware) #}
       <li class="nav-item mb-2">
-      <a href="{% url 'core:profile' %}" class="nav-link text-dark">
+        {% if user.role == 'student' %}
+        <a href="{% url 'core:student_dashboard' %}"
+          class="nav-link {% if '/dashboard/student/' in request.path %}active{% endif %}">
+          <i class="bi bi-speedometer2 me-2"></i> Dashboard
+        </a>
+
+        {% elif user.role == 'librarian' %}
+        <a href="{% url 'core:librarian_dashboard' %}"
+          class="nav-link {% if '/dashboard/librarian/' in request.path %}active{% endif %}">
+          <i class="bi bi-speedometer2 me-2"></i> Dashboard
+        </a>
+
+        {% elif user.role == 'teacher' %}
+        <a href="{% url 'core:teacher_dashboard' %}"
+          class="nav-link {% if '/dashboard/teacher/' in request.path %}active{% endif %}">
+          <i class="bi bi-speedometer2 me-2"></i> Dashboard
+        </a>
+
+        {% elif user.role == 'admin' %}
+        <a href="{% url 'core:admin_dashboard' %}"
+          class="nav-link {% if '/dashboard/admin/' in request.path %}active{% endif %}">
+          <i class="bi bi-speedometer2 me-2"></i> Dashboard
+        </a>
+
+        {% elif user.role == 'clerk' %}
+        <a href="{% url 'core:clerk_dashboard' %}"
+          class="nav-link {% if '/dashboard/clerk/' in request.path %}active{% endif %}">
+          <i class="bi bi-speedometer2 me-2"></i> Dashboard
+        </a>
+
+        {% else %}
+        {# Fallback: generic dashboard route if role unknown #}
+        <a href="{% url 'core:dashboard' %}" class="nav-link {% if '/dashboard/' == request.path %}active{% endif %}">
+          <i class="bi bi-speedometer2 me-2"></i> Dashboard
+        </a>
+        {% endif %}
+      </li>
+
+
+
+      <!-- Profile -->
+      <li class="nav-item mb-2">
+        <a href="{% url 'core:profile' %}" class="nav-link text-dark">
           <i class="bi bi-person-circle me-2"></i> Profile
         </a>
       </li>
@@ -38,7 +84,8 @@ Dynamic sidebar for logged-in users.
       <!-- Role-specific -->
       {% if request.user.role == 'student' %}
       <li class="nav-item mb-2">
-        <a class="nav-link text-dark" data-bs-toggle="collapse" href="#libraryMenuStudent" role="button" aria-expanded="false" aria-controls="libraryMenuStudent">
+        <a class="nav-link text-dark" data-bs-toggle="collapse" href="#libraryMenuStudent" role="button"
+          aria-expanded="false" aria-controls="libraryMenuStudent">
           <i class="bi bi-book me-2"></i> Library
         </a>
         <div class="collapse" id="libraryMenuStudent">
@@ -49,32 +96,33 @@ Dynamic sidebar for logged-in users.
           </ul>
         </div>
       </li>
+
       {% elif request.user.role == 'librarian' %}
       {% url 'core:books_list' as books_list_url %}
       {% url 'core:books_add' as books_add_url %}
       {% url 'core:all_book_issue_history' as issues_history_url %}
       <li class="nav-item mb-2">
-        <a class="nav-link text-dark d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#libraryMenuLibrarian" role="button" aria-controls="libraryMenuLibrarian" aria-expanded="{% if request.path == books_list_url or request.path == books_add_url or request.path == issues_history_url %}true{% else %}false{% endif %}">
+        <a class="nav-link text-dark d-flex justify-content-between align-items-center" data-bs-toggle="collapse"
+          href="#libraryMenuLibrarian" role="button" aria-controls="libraryMenuLibrarian"
+          aria-expanded="{% if request.path == books_list_url or request.path == books_add_url or request.path == issues_history_url %}true{% else %}false{% endif %}">
           <span><i class="bi bi-book me-2"></i> Library</span>
-          <i class="bi {% if request.path == books_list_url or request.path == books_add_url or request.path == issues_history_url %}bi-chevron-up{% else %}bi-chevron-down{% endif %}"></i>
+          <i
+            class="bi {% if request.path == books_list_url or request.path == books_add_url or request.path == issues_history_url %}bi-chevron-up{% else %}bi-chevron-down{% endif %}"></i>
         </a>
-        <div class="collapse {% if request.path == books_list_url or request.path == books_add_url or request.path == issues_history_url %}show{% endif %}" id="libraryMenuLibrarian">
+        <div
+          class="collapse {% if request.path == books_list_url or request.path == books_add_url or request.path == issues_history_url %}show{% endif %}"
+          id="libraryMenuLibrarian">
           <ul class="nav flex-column ms-3">
-            <li class="nav-item">
-              <a href="{{ books_list_url }}" class="nav-link text-dark">Available Books</a>
+            <li class="nav-item"><a href="{{ books_list_url }}" class="nav-link text-dark">Available Books</a></li>
+            <li class="nav-item"><a href="{{ issues_history_url }}" class="nav-link text-dark">Book Issue History</a>
             </li>
-            <li class="nav-item">
-              <a href="{{ issues_history_url }}" class="nav-link text-dark">Book Issue History</a>
-            </li>
-            <li class="nav-item">
-              <a href="{{ books_add_url }}" class="nav-link text-dark">Add Book</a>
-            </li>
-            <li class="nav-item">
-              <a href="{% url 'core:librarian_analytics' %}" class="nav-link text-dark">Analytics</a>
+            <li class="nav-item"><a href="{{ books_add_url }}" class="nav-link text-dark">Add Book</a></li>
+            <li class="nav-item"><a href="{% url 'core:librarian_analytics' %}" class="nav-link text-dark">Analytics</a>
             </li>
           </ul>
         </div>
       </li>
+
       {% elif request.user.role == 'teacher' %}
       <li class="nav-item mb-2">
         <a href="#" class="nav-link text-dark">
@@ -84,7 +132,7 @@ Dynamic sidebar for logged-in users.
       {% elif request.user.role == 'admin' %}
       <li class="nav-item mb-2">
         <a href="#" class="nav-link text-dark">
-          <i class="bi bi-speedometer2 me-2"></i> Admin Dashboard
+          <i class="bi bi-people me-2"></i> Admin Panel
         </a>
       </li>
       {% elif request.user.role == 'clerk' %}
@@ -94,8 +142,42 @@ Dynamic sidebar for logged-in users.
         </a>
       </li>
       {% endif %}
-
     </ul>
   </div>
 </nav>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const sidebarMenuEl = document.getElementById('sidebarMenu');
+    const sidebarCloseBtn = document.getElementById('sidebarCloseBtn');
+    const appSidebar = document.getElementById('appSidebar');
+
+    function getCollapse() {
+      return bootstrap.Collapse.getOrCreateInstance(sidebarMenuEl, { toggle: false });
+    }
+
+    if (sidebarCloseBtn && sidebarMenuEl) {
+      sidebarCloseBtn.addEventListener('click', function (e) {
+        e.preventDefault();
+        getCollapse().toggle();
+        appSidebar.classList.toggle('sidebar-collapsed');
+      });
+    }
+
+    const style = document.createElement('style');
+    style.innerHTML = `
+      .sidebar-collapsed {
+        width: 0 !important;
+        min-width: 0 !important;
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+        overflow: hidden;
+      }
+      .sidebar-collapsed .collapse {
+        display: none !important;
+      }
+    `;
+    document.head.appendChild(style);
+  });
+</script>
 {% endif %}
